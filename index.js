@@ -1,14 +1,14 @@
 const express = require('express');
+const app = express();
+const http = require('http').Server(app);
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
-const path = require('path');
 const cors = require('cors');
-
+const io = require('socket.io')(http);
 // Custom dependency.
 //const config = require('./server/config');
 // global.db = global.db ? global.db : require('./server/data/db')();
 
-const app = express();
 
 // Application middleware goes here.
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -22,8 +22,13 @@ app.use(helmet.hidePoweredBy());
 //   };
 //   app.use(cors(corsOptions));
 
+io.on('connection', socket => {
+    //When a connection was created.
+    console.log('new connectiion');
+    
+});
 
-app.listen(3000, () => {
-    console.log('start', `Listening on port 3000...`);
+http.listen(3001, () => {
+    console.log('start', `Listening on port 3001...`);
   });
 
