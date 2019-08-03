@@ -8,6 +8,12 @@ const cors = require('cors');
 const config = require('./config');
 const io = require('socket.io')(http);
 
+var corsOptions = { 
+  origin: 'http://localhost:3000',
+  credentials: true
+}
+
+app.use(cors(corsOptions));
 
 // connect to the database and load models
 require('./server/models').connect(config.dbUri);
