@@ -1,0 +1,11 @@
+version: "2"
+services:
+  hackevent-be:
+    build: .
+    depends_on:
+      - mongodb
+ 
+  mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"
