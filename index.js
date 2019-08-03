@@ -1,34 +1,40 @@
 const express = require('express');
-const app = express();
-const http = require('http').Server(app);
 const bodyParser = require('body-parser');
-const helmet = require('helmet');
-const cors = require('cors');
-const io = require('socket.io')(http);
-// Custom dependency.
-//const config = require('./server/config');
-// global.db = global.db ? global.db : require('./server/data/db')();
+const passport = require('passport');
+const config = require('./config');
 
+// connect to the database and load models
+require('./server/models').connect(config.dbUri);
 
-// Application middleware goes here.
+const app = express();
+// tell the app to look for static files in these directories
+//app.use(express.static('./server/static/'));
+//app.use(express.static('./client/dist/'));
+// tell the app to parse HTTP body messages
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json()); // parse application/json
-app.use(helmet.hidePoweredBy());
-// Token validation is done in the API gateway itself.
-// app.all(`${config.apiBasePath}/*`, auth.validateToken);
+// pass the passport middleware
+app.use(passport.initialize());
 
-// const corsOptions = {
-//     exposedHeaders: ['X-Total', 'X-TotalPages'],
-//   };
-//   app.use(cors(corsOptions));
+// load passport strategies
+const localSignupStrategy = require('./server/passport/local-signup');
+const localLoginStrategy = require('./server/passport/local-login');
+passport.use('local-signup', localSignupStrategy);
+passport.use('local-login', localLoginStrategy);
 
-io.on('connection', socket => {
-    //When a connection was created.
-    console.log('new connectiion');
-    
+// pass the authenticaion checker middleware
+const authCheckMiddleware = require('./server/middleware/auth-check');
+app.use('/api', authCheckMiddleware);
+
+// routes
+const authRoutes = require('./server/routes/auth');
+const apiRoutes = require('./server/routes/api');
+app.use('/auth', authRoutes);
+app.use('/api', apiRoutes);
+
+// Set Port, hosting services will look for process.env.PORT
+app.set('port', (process.env.PORT || 3000));
+
+// start the server
+app.listen(app.get('port'), () => {
+  console.log(`Server is running on port ${app.get('port')}`);
 });
-
-http.listen(3001, () => {
-    console.log('start', `Listening on port 3001...`);
-  });
-
