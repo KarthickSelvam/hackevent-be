@@ -3,6 +3,8 @@ const app = express();
 const http = require('http').Server(app);
 const bodyParser = require('body-parser');
 const passport = require('passport');
+const helmet = require('helmet');
+const cors = require('cors');
 const config = require('./config');
 const io = require('socket.io')(http);
 
