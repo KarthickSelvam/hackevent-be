@@ -2,6 +2,8 @@ version: "2"
 services:
   hackevent-be:
     build: .
+    ports:
+      - "3001:3001"
     depends_on:
       - mongodb
  
